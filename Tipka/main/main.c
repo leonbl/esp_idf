@@ -41,20 +41,11 @@ void app_main(void) {
       }
       printf("Stanje: %d\n", stanje);
 
-      gpio_set_level(16, 0);
-      gpio_set_level(17, 0);
-      gpio_set_level(18, 0);
-      gpio_set_level(19, 0);
+      gpio_set_level(16, (stanje == 0));
+      gpio_set_level(17, (stanje == 1));
+      gpio_set_level(18, (stanje == 2));
+      gpio_set_level(19, (stanje == 3));
 
-      if (stanje == 0) {
-        gpio_set_level(16, 1); // Vklopi LED 1
-      } else if (stanje == 1) {
-        gpio_set_level(17, 1); // Vklopi LED 2
-      } else if (stanje == 2) {
-        gpio_set_level(18, 1); // Vklopi LED 3
-      } else if (stanje == 3) {
-        gpio_set_level(19, 1); // Vklopi LED 4
-      }
       vTaskDelay(100 / portTICK_PERIOD_MS); // Delay for a short period
     }
   }
