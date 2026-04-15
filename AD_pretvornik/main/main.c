@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include <math.h>
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
 #include "driver/gpio.h"
@@ -20,12 +21,23 @@ void app_main(void)
         .bitwidth = ADC_BITWIDTH_DEFAULT,
         .atten = ADC_ATTEN_DB_12,
     };
-    adc_oneshot_config_channel(adc_handle, ADC_CHANNEL_6, &config);
+    adc_oneshot_config_channel(adc_handle, ADC_CHANNEL_5, &config);
 
     while(1){
         int value;
-        adc_oneshot_read(adc_handle, ADC_CHANNEL_6, &value);
-        printf("ADC: %d\n", value);
+        float v_mv, r_ntc, t_c;
+        adc_oneshot_read(adc_handle, ADC_CHANNEL_5, &value);
+        if(value < 0){
+            printf("Napaka meritve\n");
+            vTaskDelay(pdMS_TO_TICKS(500));
+            continue;
+        }
+
+        v_mv = value * 3300 / 4095.0f;
+        r_ntc = 10000 * (3300 / v_mv - 1.0f);
+        t_c = 1.0f / (1.0f / 298.15f + logf(r_ntc / 10000) / 3950.0f) - 273.15f;
+
+        printf("T = %.1f C\n", t_c);
         vTaskDelay(pdMS_TO_TICKS(500));
     }
 }
